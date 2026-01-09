@@ -23,6 +23,9 @@ include = ["src"]
 ignore = ["notebooks", "notebooks/**"]
 reportGeneralTypeIssues = "none"
 
+[tool.ruff.lint]
+ignore = ["F401"]
+
 [tool.uv]
 package = true
 

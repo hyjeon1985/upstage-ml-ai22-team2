@@ -3,7 +3,8 @@ import pandas as pd
 from ...util.path import ext_data_dir, raw_data_dir
 from ..preprocess.pipeline import Pipeline
 from ..preprocess.useless_block import DropUselessColumnsBlock, UselessValueToNaBlock
-from .canceled_flag import CanceledFlagBlock
+from .build_year import BuildYearFeaturesBlock, DropInvalidBuildAgeBlock
+from .canceled_flag import CanceledFinalizeBlock, CanceledFlagBlock
 from .contract_date import ContractDateBlock
 from .sigudong import SplitGuDongBlock
 
@@ -48,6 +49,8 @@ def hpp_light_gbm():
             SplitGuDongBlock(),
             ContractDateBlock(),
             CanceledFlagBlock(col="해제사유발생일", flag="_is_canceled"),
+            BuildYearFeaturesBlock(),
+            CanceledFinalizeBlock(col="_is_canceled"),
             # ParseAddressBlock(),
             # MedianImputer(cols=["전용면적(㎡)", "층"]),
             # AreaOutlierFilter(col="전용면적(㎡)"),

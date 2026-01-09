@@ -25,8 +25,3 @@ class SplitGuDongBlock(BaseBlock):
 
         X = X.drop(columns=["시군구"])
         return X
-
-
-# -----------------------------
-# 시구동 컬럼 분리
-# -----------------------------
