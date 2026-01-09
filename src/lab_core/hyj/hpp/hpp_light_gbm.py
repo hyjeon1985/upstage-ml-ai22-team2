@@ -51,6 +51,7 @@ def hpp_light_gbm():
             CanceledFlagBlock(col="해제사유발생일", flag="_is_canceled"),
             BuildYearFeaturesBlock(),
             CanceledFinalizeBlock(col="_is_canceled"),
+            DropInvalidBuildAgeBlock(),
             # ParseAddressBlock(),
             # MedianImputer(cols=["전용면적(㎡)", "층"]),
             # AreaOutlierFilter(col="전용면적(㎡)"),
