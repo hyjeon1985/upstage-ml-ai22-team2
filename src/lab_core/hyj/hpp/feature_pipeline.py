@@ -3,6 +3,8 @@ from __future__ import annotations
 import pandas as pd
 
 from ..pipeline.base import BaseBlock, Pipeline
+from ..pipeline.category_block import CategoryCleanBlock
+from ..pipeline.useless_block import UselessValueToNaBlock
 
 
 class RenameColumnsBlock(BaseBlock):
@@ -15,22 +17,6 @@ class RenameColumnsBlock(BaseBlock):
 
 class LoadNamePartsBlock(BaseBlock):
     """도로명 파생 컬럼 생성 블록 (TODO: 구현)"""
-
-    def transform(self, X: pd.DataFrame, *, is_train: bool) -> pd.DataFrame:
-        _ = is_train
-        return X
-
-
-class UselessValueToNaBlock(BaseBlock):
-    """유의미하지 않은 값 -> 결측치 변환 블록 (TODO: 구현)"""
-
-    def transform(self, X: pd.DataFrame, *, is_train: bool) -> pd.DataFrame:
-        _ = is_train
-        return X
-
-
-class CategoryCleanBlock(BaseBlock):
-    """범주형 정리 블록 (TODO: 구현)"""
 
     def transform(self, X: pd.DataFrame, *, is_train: bool) -> pd.DataFrame:
         _ = is_train
@@ -124,8 +110,23 @@ def build_fe_pipeline() -> Pipeline:
         blocks=[
             RenameColumnsBlock(),
             LoadNamePartsBlock(),
-            UselessValueToNaBlock(),
-            CategoryCleanBlock(),
+            UselessValueToNaBlock(
+                rules={
+                    "trade_type": ["-"],
+                }
+            ),
+            CategoryCleanBlock(
+                cols=[
+                    "corridor_type",
+                    "heating_type",
+                    "manage_type",
+                    "electric_contract_type",
+                    "cleaning_type",
+                    "complex_type",
+                    "trade_type",
+                    "sale_type",
+                ]
+            ),
             LeaseTypeBlock(),
             SplitGuDongBlock(),
             CoordFillBlock(),
