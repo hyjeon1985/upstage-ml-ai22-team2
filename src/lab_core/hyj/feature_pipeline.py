@@ -1437,20 +1437,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    if args.model == "both":
-        main(
-            model_type="lgbm",
-            target_transform=args.target_transform,
-            seed=args.seed,
-        )
-        main(
-            model_type="rf",
-            target_transform=args.target_transform,
-            seed=args.seed,
-        )
-    else:
-        main(
-            model_type=args.model,
-            target_transform=args.target_transform,
-            seed=args.seed,
-        )
+    main(
+        model_type=args.model,
+        target_transform=args.target_transform,
+        seed=args.seed,
+    )
