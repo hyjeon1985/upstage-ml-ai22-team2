@@ -62,6 +62,7 @@ FEATURE_COLS = [
     "gross_to_net_ratio",
     "builder_freq",
     "developer_freq",
+    "apt_name_freq",
     "gu",
     "dong",
     "apt_name",
@@ -1018,11 +1019,14 @@ def apply_freq_features(
     *,
     builder_col: str = "builder",
     developer_col: str = "developer",
+    apt_name_col: str = "apt_name",
     builder_out: str = "builder_freq",
     developer_out: str = "developer_freq",
+    apt_name_out: str = "apt_name_freq",
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     builder_map = build_freq_map(train[builder_col])
     developer_map = build_freq_map(train[developer_col])
+    apt_name_map = build_freq_map(train[apt_name_col])
     train = apply_freq_map(
         train, src_col=builder_col, out_col=builder_out, freq_map=builder_map
     )
@@ -1032,14 +1036,23 @@ def apply_freq_features(
     valid = apply_freq_map(
         valid, src_col=builder_col, out_col=builder_out, freq_map=builder_map
     )
+    valid = apply_freq_map(
+        valid, src_col=apt_name_col, out_col=apt_name_out, freq_map=apt_name_map
+    )
     test = apply_freq_map(
         test, src_col=builder_col, out_col=builder_out, freq_map=builder_map
     )
     test = apply_freq_map(
         test, src_col=developer_col, out_col=developer_out, freq_map=developer_map
     )
+    test = apply_freq_map(
+        test, src_col=apt_name_col, out_col=apt_name_out, freq_map=apt_name_map
+    )
     train = apply_freq_map(
         train, src_col=developer_col, out_col=developer_out, freq_map=developer_map
+    )
+    train = apply_freq_map(
+        train, src_col=apt_name_col, out_col=apt_name_out, freq_map=apt_name_map
     )
     return train, valid, test
 
@@ -1368,7 +1381,7 @@ def main(
 
     out_dir_path = out_dir("subs")
     out_dir_path.mkdir(parents=True, exist_ok=True)
-    run_id = make_run_id("feature_pipeline", mid_id="default")
+    run_id = make_run_id("submission")
 
     if model_type == "both":
         pred_lgbm = train_predict(
@@ -1389,8 +1402,8 @@ def main(
         )
         sub_lgbm = pd.DataFrame({"target": pred_lgbm.astype(int)})
         sub_rf = pd.DataFrame({"target": pred_rf.astype(int)})
-        out_lgbm = out_dir_path / f"{run_id}_{_model_tag('lgbm')}_seed{seed}.csv"
-        out_rf = out_dir_path / f"{run_id}_{_model_tag('rf')}_seed{seed}.csv"
+        out_lgbm = out_dir_path / f"{run_id}_{_model_tag('lgbm')}.csv"
+        out_rf = out_dir_path / f"{run_id}_{_model_tag('rf')}.csv"
         sub_lgbm.to_csv(out_lgbm, index=False)
         sub_rf.to_csv(out_rf, index=False)
         print(f"제출 파일 저장: {out_lgbm}")
@@ -1401,7 +1414,7 @@ def main(
             + ENSEMBLE_WEIGHTS["rf"] * pred_rf
         )
         sub_ens = pd.DataFrame({"target": ensemble.round().astype(int)})
-        out_ens = out_dir_path / f"{run_id}_{_model_tag('ensemble')}_seed{seed}.csv"
+        out_ens = out_dir_path / f"{run_id}_{_model_tag('ensemble')}.csv"
         sub_ens.to_csv(out_ens, index=False)
         print(f"제출 파일 저장: {out_ens}")
         return
@@ -1415,7 +1428,7 @@ def main(
         seed=seed,
     )
     submission = pd.DataFrame({"target": pred.astype(int)})
-    out_path = out_dir_path / f"{run_id}_{_model_tag(model_type)}_seed{seed}.csv"
+    out_path = out_dir_path / f"{run_id}_{_model_tag(model_type)}.csv"
     submission.to_csv(out_path, index=False)
     print(f"제출 파일 저장: {out_path}")
 
