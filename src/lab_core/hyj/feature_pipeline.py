@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from lightgbm import LGBMRegressor
+from lightgbm import LGBMRegressor, early_stopping, log_evaluation
 from scipy.spatial import cKDTree
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
@@ -1032,7 +1032,10 @@ def train_predict_lgbm(
         y_tr_t,
         eval_set=[(X_val_p, y_val_t)],
         eval_metric="rmse",
-        early_stopping_rounds=50,
+        callbacks=[
+            early_stopping(stopping_rounds=50),
+            log_evaluation(period=100),
+        ],
     )
     val_pred = np.asarray(model.predict(X_val_p))
     val_pred = _invert_target_transform(val_pred, target_transform=target_transform)
