@@ -92,6 +92,9 @@ CATEGORICAL_COLS = [
 ]
 NUMERIC_COLS = [c for c in FEATURE_COLS if c not in CATEGORICAL_COLS]
 
+# RF에서는 고카디널리티 컬럼을 제외한다.
+FEATURE_COLS_RF = [c for c in FEATURE_COLS if c not in {"apt_name"}]
+
 # Int-like columns (use nullable Int16 where safe)
 INT_COLS = [
     "contract_year",
@@ -1136,7 +1139,9 @@ def train_predict_rf(
     y_val_t = _apply_target_transform(y_val, target_transform=target_transform)
     y_full_t = _apply_target_transform(y_train, target_transform=target_transform)
 
-    X_tr_p, X_val_p, X_test_p = prepare_for_rf_train_valid_test(X_tr, X_val, X_test)
+    X_tr_p, X_val_p, X_test_p = prepare_for_rf_train_valid_test(
+        X_tr, X_val, X_test, feature_cols=FEATURE_COLS_RF
+    )
     model = RandomForestRegressor(**RF_PARAMS, random_state=seed, n_jobs=-1)
     model.fit(X_tr_p, y_tr_t)
     val_pred = np.asarray(model.predict(X_val_p))
@@ -1147,7 +1152,9 @@ def train_predict_rf(
     rmse = np.sqrt(mean_squared_error(y_val_eval, val_pred))
     print(f"[RF] valid RMSE: {rmse:,.0f}")
 
-    X_full_p, X_test_p = prepare_for_rf_train_test(X_train, X_test)
+    X_full_p, X_test_p = prepare_for_rf_train_test(
+        X_train, X_test, feature_cols=FEATURE_COLS_RF
+    )
     model.fit(X_full_p, y_full_t)
     pred = np.asarray(model.predict(X_test_p))
     pred = _invert_target_transform(pred, target_transform=target_transform)
