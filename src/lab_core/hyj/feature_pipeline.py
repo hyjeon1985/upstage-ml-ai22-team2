@@ -1019,9 +1019,21 @@ def train_predict_lgbm(
         n_estimators=300,
         learning_rate=0.05,
         num_leaves=127,
+        min_data_in_leaf=50,
+        feature_fraction=0.9,
+        bagging_fraction=0.8,
+        bagging_freq=1,
+        reg_alpha=0.1,
+        reg_lambda=0.1,
         random_state=seed,
     )
-    model.fit(X_tr_p, y_tr_t)
+    model.fit(
+        X_tr_p,
+        y_tr_t,
+        eval_set=[(X_val_p, y_val_t)],
+        eval_metric="rmse",
+        early_stopping_rounds=50,
+    )
     val_pred = np.asarray(model.predict(X_val_p))
     val_pred = _invert_target_transform(val_pred, target_transform=target_transform)
     y_val_eval = _invert_target_transform(
