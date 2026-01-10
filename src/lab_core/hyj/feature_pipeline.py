@@ -101,6 +101,36 @@ INT_COLS = [
     "build_year",
 ]
 
+# =========================
+# Model Params
+# =========================
+
+LGBM_PARAMS = {
+    "n_estimators": 800,
+    "learning_rate": 0.03,
+    "num_leaves": 255,
+    "min_data_in_leaf": 30,
+    "feature_fraction": 0.9,
+    "bagging_fraction": 0.8,
+    "bagging_freq": 1,
+    "reg_alpha": 0.1,
+    "reg_lambda": 0.1,
+}
+
+RF_PARAMS = {
+    "n_estimators": 300,
+    "max_depth": 24,
+    "min_samples_split": 4,
+    "min_samples_leaf": 2,
+    "max_features": "sqrt",
+    "bootstrap": True,
+}
+
+ENSEMBLE_WEIGHTS = {
+    "lgbm": 0.7,
+    "rf": 0.3,
+}
+
 # Meta Column Names
 _IS_TRAIN = "_is_train"
 _ORG_IDX = "_ORG_IDX"
@@ -1021,18 +1051,7 @@ def train_predict_lgbm(
     X_tr_p, X_val_p, X_test_p, _ = prepare_for_lgbm_train_valid_test(
         X_tr, X_val, X_test
     )
-    model = LGBMRegressor(
-        n_estimators=800,
-        learning_rate=0.03,
-        num_leaves=255,
-        min_data_in_leaf=30,
-        feature_fraction=0.9,
-        bagging_fraction=0.8,
-        bagging_freq=1,
-        reg_alpha=0.1,
-        reg_lambda=0.1,
-        random_state=seed,
-    )
+    model = LGBMRegressor(**LGBM_PARAMS, random_state=seed)
     model.fit(
         X_tr_p,
         y_tr_t,
@@ -1085,16 +1104,7 @@ def train_predict_rf(
     y_full_t = _apply_target_transform(y_train, target_transform=target_transform)
 
     X_tr_p, X_val_p, X_test_p = prepare_for_rf_train_valid_test(X_tr, X_val, X_test)
-    model = RandomForestRegressor(
-        n_estimators=300,
-        max_depth=24,
-        min_samples_split=4,
-        min_samples_leaf=2,
-        max_features="sqrt",
-        bootstrap=True,
-        random_state=seed,
-        n_jobs=-1,
-    )
+    model = RandomForestRegressor(**RF_PARAMS, random_state=seed, n_jobs=-1)
     model.fit(X_tr_p, y_tr_t)
     val_pred = np.asarray(model.predict(X_val_p))
     val_pred = _invert_target_transform(val_pred, target_transform=target_transform)
@@ -1346,7 +1356,10 @@ def main(
         print(f"제출 파일 저장: {out_lgbm}")
         print(f"제출 파일 저장: {out_rf}")
 
-        ensemble = 0.5 * pred_lgbm + 0.5 * pred_rf
+        ensemble = (
+            ENSEMBLE_WEIGHTS["lgbm"] * pred_lgbm
+            + ENSEMBLE_WEIGHTS["rf"] * pred_rf
+        )
         sub_ens = pd.DataFrame({"target": ensemble.round().astype(int)})
         out_ens = out_dir_path / f"{run_id}_ensemble_seed{seed}.csv"
         sub_ens.to_csv(out_ens, index=False)
