@@ -63,6 +63,6 @@ echo "[BOOTSTRAP] LAB_PRJ_ROOT set to ${LAB_PRJ_ROOT_VALUE}"
 # -----------------------------
 echo "[BOOTSTRAP] Installing korean fonts..."
 
-bash ./scripts/install_korean_fonts.sh
+bash ./script/install_korean_fonts.sh
 
 echo "[BOOTSTRAP] Bootstrap completed successfully."

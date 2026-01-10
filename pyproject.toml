@@ -3,16 +3,19 @@ name = "upstage-ml-ai22-team2-hpp"
 version = "0.1.0"
 requires-python = "==3.10.13"
 dependencies = [
-  "eli5==0.16.0",
-  "matplotlib==3.10.7",
-  "numpy==1.26.4",
-  "pandas==2.3.3",
-  "scikit-learn==1.7.2",
-  "scipy==1.15.3",
-  "seaborn==0.13.2",
-  "statsmodels==0.14.6",
-  "tqdm==4.67.1"
+  "matplotlib==3.7.1",
+  "numpy==1.23.5",
+  "pandas==1.5.3",
+  "lightgbm==4.2.0",
+  "scikit-learn==1.2.2",
+  "scipy==1.11.3",
+  "seaborn==0.12.2",
+  "statsmodels==0.14.0",
+  "tqdm==4.66.1"
 ]
+
+[project.scripts]
+feature_pipeline = "lab_core.hyj.feature_pipeline:main"
 
 [dependency-groups]
 dev = ["ipykernel==6.27.1", "jupyter==1.0.0"]

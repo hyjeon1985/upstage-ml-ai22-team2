@@ -2,22 +2,27 @@ import numpy as np
 
 
 def haversine_distance(lat1, lon1, lat2, lon2):
-    """위경도 기반 거리 계산 (km)
+    """위경도 기반 대원거리(km)를 계산한다."""
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
 
-    Haversine 공식을 사용하여 두 지점 간의 대원거리(great-circle distance)를 계산합니다.
-    지구를 완전한 구로 가정합니다.
-
-    Parameters:
-        lat1, lon1: 첫 번째 지점의 위도, 경도
-        lat2, lon2: 두 번째 지점의 위도, 경도
-
-    Returns:
-        두 지점 간의 거리 (km)
-    """
-    R = 6371  # 지구 반지름 (km)
-    lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
     dlon = lon2 - lon1
+
     a = np.sin(dlat / 2) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
-    c = 2 * np.arcsin(np.sqrt(a))
-    return R * c
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1 - a))
+
+    earth_radius_km = 6371.0
+    return earth_radius_km * c
+
+
+def to_xy_km(lat: np.ndarray, lon: np.ndarray, *, lat0: float) -> np.ndarray:
+    """위경도를 기준 위도 기준의 평면 km 좌표로 근사 변환한다."""
+    lat_r = np.radians(lat)
+    lon_r = np.radians(lon)
+    lat0_r = np.radians(lat0)
+    x = lon_r * np.cos(lat0_r) * 6371.0
+    y = lat_r * 6371.0
+    return np.column_stack([y, x])

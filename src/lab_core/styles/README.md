@@ -12,7 +12,7 @@
 ### 폰트 설치
 
 ```bash
-bash scripts/install_korean_fonts.sh
+bash script/install_korean_fonts.sh
 ```
 
 - `bootstrap.sh` 스크립트 실행 과정에 포함되어 있음.

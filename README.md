@@ -138,7 +138,7 @@ jupyter==1.0.0
 │
 ├─ outputs/       # 학습 모델, 제출 csv 등
 │
-├─ scripts/       # CLI 스크립트 (*.py, *.sh)
+├─ script/       # CLI 스크립트 (*.py, *.sh)
 │
 ├─ src/
 │  └─ lab_core/   # 공통 파이썬 패키지

@@ -19,13 +19,14 @@ class BuildYearFeaturesBlock(BaseBlock):
         contract_year_col: str = "계약년",
         min_year: int = 1937,
         max_year: int = 2023,
+        max_lead_year: int = 4,
         validate: bool = True,
     ):
         self.build_year_col = build_year_col
         self.contract_year_col = contract_year_col
         self.min_year = min_year
         self.max_year = max_year
-        self.max_lead_year: 
+        self.max_lead_year = max_lead_year
         self.validate = validate
 
     def transform(self, X: pd.DataFrame, *, is_train: bool) -> pd.DataFrame:
@@ -66,7 +67,7 @@ class BuildYearFeaturesBlock(BaseBlock):
         X["건물나이"] = build_age.clip(lower=0)
 
         # 범주형 성격(0~) : 계약이 건축보다 선행한 정도
-        X["건축지연도"] = (-build_age).clip(lower=0, upper=4)
+        X["건축지연도"] = (-build_age).clip(lower=0, upper=self.max_lead_year)
 
         return X
 
