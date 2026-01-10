@@ -93,7 +93,13 @@ CATEGORICAL_COLS = [
 NUMERIC_COLS = [c for c in FEATURE_COLS if c not in CATEGORICAL_COLS]
 
 # Int-like columns (use nullable Int16 where safe)
-INT_COLS = ["contract_year", "contract_month", "contract_quarter", "floor", "build_year"]
+INT_COLS = [
+    "contract_year",
+    "contract_month",
+    "contract_quarter",
+    "floor",
+    "build_year",
+]
 
 # Meta Column Names
 _IS_TRAIN = "_is_train"
@@ -1016,10 +1022,10 @@ def train_predict_lgbm(
         X_tr, X_val, X_test
     )
     model = LGBMRegressor(
-        n_estimators=300,
-        learning_rate=0.05,
-        num_leaves=127,
-        min_data_in_leaf=50,
+        n_estimators=800,
+        learning_rate=0.03,
+        num_leaves=255,
+        min_data_in_leaf=30,
         feature_fraction=0.9,
         bagging_fraction=0.8,
         bagging_freq=1,
@@ -1080,9 +1086,12 @@ def train_predict_rf(
 
     X_tr_p, X_val_p, X_test_p = prepare_for_rf_train_valid_test(X_tr, X_val, X_test)
     model = RandomForestRegressor(
-        n_estimators=50,
-        max_depth=20,
-        min_samples_split=5,
+        n_estimators=300,
+        max_depth=24,
+        min_samples_split=4,
+        min_samples_leaf=2,
+        max_features="sqrt",
+        bootstrap=True,
         random_state=seed,
         n_jobs=-1,
     )
@@ -1307,6 +1316,43 @@ def main(
         params=PARAMS,
     )
 
+    out_dir_path = out_dir("subs")
+    out_dir_path.mkdir(parents=True, exist_ok=True)
+    run_id = make_run_id("feature_pipeline", mid_id="default")
+
+    if model_type == "both":
+        pred_lgbm = train_predict(
+            X_train,
+            y_train,
+            X_test,
+            model_type="lgbm",
+            target_transform=target_transform,
+            seed=seed,
+        )
+        pred_rf = train_predict(
+            X_train,
+            y_train,
+            X_test,
+            model_type="rf",
+            target_transform=target_transform,
+            seed=seed,
+        )
+        sub_lgbm = pd.DataFrame({"target": pred_lgbm.astype(int)})
+        sub_rf = pd.DataFrame({"target": pred_rf.astype(int)})
+        out_lgbm = out_dir_path / f"{run_id}_lgbm_seed{seed}.csv"
+        out_rf = out_dir_path / f"{run_id}_rf_seed{seed}.csv"
+        sub_lgbm.to_csv(out_lgbm, index=False)
+        sub_rf.to_csv(out_rf, index=False)
+        print(f"제출 파일 저장: {out_lgbm}")
+        print(f"제출 파일 저장: {out_rf}")
+
+        ensemble = 0.5 * pred_lgbm + 0.5 * pred_rf
+        sub_ens = pd.DataFrame({"target": ensemble.round().astype(int)})
+        out_ens = out_dir_path / f"{run_id}_ensemble_seed{seed}.csv"
+        sub_ens.to_csv(out_ens, index=False)
+        print(f"제출 파일 저장: {out_ens}")
+        return
+
     pred = train_predict(
         X_train,
         y_train,
@@ -1315,11 +1361,7 @@ def main(
         target_transform=target_transform,
         seed=seed,
     )
-
     submission = pd.DataFrame({"target": pred.astype(int)})
-    out_dir_path = out_dir("subs")
-    out_dir_path.mkdir(parents=True, exist_ok=True)
-    run_id = make_run_id("feature_pipeline", mid_id="default")
     out_path = out_dir_path / f"{run_id}_{model_type}_seed{seed}.csv"
     submission.to_csv(out_path, index=False)
     print(f"제출 파일 저장: {out_path}")
