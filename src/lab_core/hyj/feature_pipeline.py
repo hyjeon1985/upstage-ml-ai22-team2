@@ -1,3 +1,5 @@
+import difflib
+
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMRegressor, early_stopping, log_evaluation
@@ -168,6 +170,7 @@ def _model_tag(model_type: str) -> str:
         return f"ens_{_model_tag('lgbm')}_{_model_tag('rf')}_w{w_lgbm}-{w_rf}"
     return model_type
 
+
 # Meta Column Names
 _IS_TRAIN = "_is_train"
 _ORG_IDX = "_ORG_IDX"
@@ -213,6 +216,15 @@ RAW_COL_RENAME = {
     "좌표Y": "y",
 }
 
+APT_COL_RENAME = {
+    "주소(시군구)": "gu",
+    "주소(읍면동)": "dong",
+    "주소(도로명)": "load_name_main",
+    "주소(도로상세주소)": "load_name_sub",
+    "좌표X": "x",
+    "좌표Y": "y",
+}
+
 SUBWAY_COL_RENAME = {
     "역사_ID": "station_id",
     "역사명": "station_name",
@@ -251,6 +263,129 @@ def rename_bus(df: pd.DataFrame) -> pd.DataFrame:
 
 def rename_coord(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=COORD_COL_RENAME)
+
+
+def rename_apt(df: pd.DataFrame) -> pd.DataFrame:
+    return df.rename(columns=APT_COL_RENAME)
+
+
+def build_load_name_parts(
+    df: pd.DataFrame,
+    *,
+    src_col: str = "road_name",
+    out_full: str = "load_name_full",
+    out_main: str = "load_name_main",
+    out_sub: str = "load_name_sub",
+) -> pd.DataFrame:
+    """
+    도로명 전체/메인/서브를 분리해서 저장한다.
+    """
+    out = df.copy()
+    s = out[src_col].fillna("").astype(str).str.strip()
+    out[out_full] = s
+    split = s.str.split(n=1, expand=True)
+    out[out_main] = split[0].fillna("").astype(str)
+    out[out_sub] = split[1].fillna("").astype(str) if split.shape[1] > 1 else ""
+    return out
+
+
+def build_load_name_full(
+    df: pd.DataFrame,
+    *,
+    main_col: str = "load_name_main",
+    sub_col: str = "load_name_sub",
+    out_full: str = "load_name_full",
+) -> pd.DataFrame:
+    """
+    도로명 메인/서브를 합쳐 전체 도로명 컬럼을 만든다.
+    """
+    out = df.copy()
+    main = out[main_col].fillna("").astype(str).str.strip()
+    sub = out[sub_col].fillna("").astype(str).str.strip()
+    out[out_full] = (main + " " + sub).str.strip()
+    out[out_full] = out[out_full].where(out[out_full] != "", main)
+    return out
+
+
+def build_apt_similarity_index(
+    apt_df: pd.DataFrame,
+    *,
+    gu_col: str = "gu",
+    dong_col: str = "dong",
+    main_col: str = "load_name_main",
+    sub_col: str = "load_name_sub",
+    x_col: str = "x",
+    y_col: str = "y",
+) -> dict[tuple[str, str, str], list[tuple[str, tuple[float, float]]]]:
+    """
+    k-apt 좌표를 유사도 매칭하기 위한 인덱스를 만든다.
+    """
+    tmp = apt_df[[gu_col, dong_col, main_col, sub_col, x_col, y_col]].copy()
+    tmp = tmp.dropna(subset=[gu_col, dong_col, main_col, x_col, y_col])
+    tmp[gu_col] = tmp[gu_col].astype(str).str.strip()
+    tmp[dong_col] = tmp[dong_col].astype(str).str.strip()
+    tmp[main_col] = tmp[main_col].astype(str).str.strip()
+    tmp[sub_col] = tmp[sub_col].fillna("").astype(str).str.strip()
+
+    index: dict[tuple[str, str, str], list[tuple[str, tuple[float, float]]]] = {}
+    for _, row in tmp.iterrows():
+        key = (row[gu_col], row[dong_col], row[main_col])
+        index.setdefault(key, []).append(
+            (row[sub_col], (float(row[x_col]), float(row[y_col])))
+        )
+    return index
+
+
+def fill_coords_by_apt_similarity(
+    df: pd.DataFrame,
+    *,
+    apt_index: dict[tuple[str, str, str], list[tuple[str, tuple[float, float]]]],
+    gu_col: str = "gu",
+    dong_col: str = "dong",
+    main_col: str = "load_name_main",
+    sub_col: str = "load_name_sub",
+    x_col: str = "x",
+    y_col: str = "y",
+) -> pd.DataFrame:
+    """
+    k-apt 후보군 내에서 도로상세주소 유사도가 가장 높은 좌표로 보정한다.
+    """
+    out = df.copy()
+    na = out[x_col].isna() | out[y_col].isna()
+    if not na.any():
+        return out
+
+    def _best_xy(
+        target_sub: str, candidates: list[tuple[str, tuple[float, float]]]
+    ) -> tuple[float, float] | None:
+        if not candidates:
+            return None
+        if not target_sub:
+            return candidates[0][1]
+        best_xy = None
+        best_score = -1.0
+        for cand_sub, xy in candidates:
+            score = difflib.SequenceMatcher(None, target_sub, cand_sub).ratio()
+            if score > best_score:
+                best_score = score
+                best_xy = xy
+        return best_xy
+
+    for idx in out.index[na]:
+        gu = str(out.at[idx, gu_col]).strip()
+        dong = str(out.at[idx, dong_col]).strip()
+        main = str(out.at[idx, main_col]).strip()
+        sub = str(out.at[idx, sub_col]).strip()
+        key = (gu, dong, main)
+        candidates = apt_index.get(key)
+        if not candidates:
+            continue
+        xy = _best_xy(sub, candidates)
+        if xy is None:
+            continue
+        out.at[idx, x_col] = xy[0]
+        out.at[idx, y_col] = xy[1]
+    return out
 
 
 # =========================
@@ -1214,6 +1349,7 @@ def run_fe_train_test(
     *,
     subway: pd.DataFrame,
     bus: pd.DataFrame,
+    apt: pd.DataFrame,
     coord: pd.DataFrame,
     params: dict,
 ):
@@ -1232,9 +1368,11 @@ def run_fe_train_test(
     test = rename_train_test(test)
     subway = rename_subway(subway)
     bus = rename_bus(bus)
+    apt = rename_apt(apt)
     coord = rename_coord(coord)
 
     X_all, y = concat_train_test(train, test)
+    X_all = build_load_name_parts(X_all, src_col="road_name")
 
     # ---------------------
     # 0-1. 유의미하지 않은 값 처리
@@ -1271,40 +1409,55 @@ def run_fe_train_test(
     # ---------------------
     # 2. 좌표 보정 준비 (train 기준)
     # ---------------------
+    apt = build_load_name_full(apt)
+    apt_coord_dict = build_coord_dict(
+        apt,
+        key_col="map_key",
+        gu_col="gu",
+        road_col="load_name_full",
+        x_col="x",
+        y_col="y",
+    )
     coord_dict = build_coord_dict(
         coord,
         key_col="map_key",
         x_col="x",
         y_col="y",
     )
-
-    gudong_prefix_mean_xy = build_gudong_road_prefix_mean_xy(
-        X_all,
-        gu_col="gu",
-        dong_col="dong",
-        road_col="road_name",
-        x_col="x",
-        y_col="y",
-    )
-    gudong_mean_xy = build_gudong_mean_xy(
-        X_all,
-        gu_col="gu",
-        dong_col="dong",
-        x_col="x",
-        y_col="y",
-    )
+    apt_index = build_apt_similarity_index(apt)
 
     # ---------------------
     # 3. 좌표 채우기
     # ---------------------
     X_all = fill_coords(
         X_all,
-        coord_dict=coord_dict,
-        gudong_prefix_mean_xy=gudong_prefix_mean_xy,
-        gudong_mean_xy=gudong_mean_xy,
+        coord_dict=apt_coord_dict,
+        gudong_prefix_mean_xy=None,
+        gudong_mean_xy=None,
         gu_col="gu",
         dong_col="dong",
-        road_col="road_name",
+        road_col="load_name_full",
+        x_col="x",
+        y_col="y",
+    )
+    X_all = fill_coords(
+        X_all,
+        coord_dict=coord_dict,
+        gudong_prefix_mean_xy=None,
+        gudong_mean_xy=None,
+        gu_col="gu",
+        dong_col="dong",
+        road_col="load_name_full",
+        x_col="x",
+        y_col="y",
+    )
+    X_all = fill_coords_by_apt_similarity(
+        X_all,
+        apt_index=apt_index,
+        gu_col="gu",
+        dong_col="dong",
+        main_col="load_name_main",
+        sub_col="load_name_sub",
         x_col="x",
         y_col="y",
     )
@@ -1368,13 +1521,14 @@ def main(
     seed: int = 42,
 ):
     train, test, subway, bus = load_raw_datas()
-    _, coord = load_ext_datas()
+    apt, coord = load_ext_datas()
 
     X_train, y_train, X_test = run_fe_train_test(
         train,
         test,
         subway=subway,
         bus=bus,
+        apt=apt,
         coord=coord,
         params=PARAMS,
     )
@@ -1410,8 +1564,7 @@ def main(
         print(f"제출 파일 저장: {out_rf}")
 
         ensemble = (
-            ENSEMBLE_WEIGHTS["lgbm"] * pred_lgbm
-            + ENSEMBLE_WEIGHTS["rf"] * pred_rf
+            ENSEMBLE_WEIGHTS["lgbm"] * pred_lgbm + ENSEMBLE_WEIGHTS["rf"] * pred_rf
         )
         sub_ens = pd.DataFrame({"target": ensemble.round().astype(int)})
         out_ens = out_dir_path / f"{run_id}_{_model_tag('ensemble')}.csv"
