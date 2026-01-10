@@ -1018,7 +1018,7 @@ def train_predict_lgbm(
     model = LGBMRegressor(
         n_estimators=300,
         learning_rate=0.05,
-        num_leaves=64,
+        num_leaves=127,
         random_state=seed,
     )
     model.fit(X_tr_p, y_tr_t)
