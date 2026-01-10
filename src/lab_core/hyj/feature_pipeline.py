@@ -131,6 +131,39 @@ ENSEMBLE_WEIGHTS = {
     "rf": 0.3,
 }
 
+
+def _lr_tag(value: float) -> str:
+    """
+    learning_rate를 파일명용 문자열로 변환한다. (예: 0.05 -> "05")
+    """
+    return f"{value:.2f}".replace("0.", "")
+
+
+def _model_tag(model_type: str) -> str:
+    """
+    파일명에 들어갈 파라미터 태그를 생성한다.
+    """
+    if model_type == "lgbm":
+        return (
+            f"lgbm_n{LGBM_PARAMS['n_estimators']}"
+            f"_lr{_lr_tag(LGBM_PARAMS['learning_rate'])}"
+            f"_l{LGBM_PARAMS['num_leaves']}"
+            f"_m{LGBM_PARAMS['min_data_in_leaf']}"
+        )
+    if model_type == "rf":
+        depth = RF_PARAMS.get("max_depth")
+        depth_tag = "0" if depth is None else str(depth)
+        return (
+            f"rf_n{RF_PARAMS['n_estimators']}"
+            f"_d{depth_tag}"
+            f"_m{RF_PARAMS['min_samples_leaf']}"
+        )
+    if model_type == "ensemble":
+        w_lgbm = int(round(ENSEMBLE_WEIGHTS["lgbm"] * 100))
+        w_rf = int(round(ENSEMBLE_WEIGHTS["rf"] * 100))
+        return f"ens_{_model_tag('lgbm')}_{_model_tag('rf')}_w{w_lgbm}-{w_rf}"
+    return model_type
+
 # Meta Column Names
 _IS_TRAIN = "_is_train"
 _ORG_IDX = "_ORG_IDX"
@@ -1349,8 +1382,8 @@ def main(
         )
         sub_lgbm = pd.DataFrame({"target": pred_lgbm.astype(int)})
         sub_rf = pd.DataFrame({"target": pred_rf.astype(int)})
-        out_lgbm = out_dir_path / f"{run_id}_lgbm_seed{seed}.csv"
-        out_rf = out_dir_path / f"{run_id}_rf_seed{seed}.csv"
+        out_lgbm = out_dir_path / f"{run_id}_{_model_tag('lgbm')}_seed{seed}.csv"
+        out_rf = out_dir_path / f"{run_id}_{_model_tag('rf')}_seed{seed}.csv"
         sub_lgbm.to_csv(out_lgbm, index=False)
         sub_rf.to_csv(out_rf, index=False)
         print(f"제출 파일 저장: {out_lgbm}")
@@ -1361,7 +1394,7 @@ def main(
             + ENSEMBLE_WEIGHTS["rf"] * pred_rf
         )
         sub_ens = pd.DataFrame({"target": ensemble.round().astype(int)})
-        out_ens = out_dir_path / f"{run_id}_ensemble_seed{seed}.csv"
+        out_ens = out_dir_path / f"{run_id}_{_model_tag('ensemble')}_seed{seed}.csv"
         sub_ens.to_csv(out_ens, index=False)
         print(f"제출 파일 저장: {out_ens}")
         return
@@ -1375,7 +1408,7 @@ def main(
         seed=seed,
     )
     submission = pd.DataFrame({"target": pred.astype(int)})
-    out_path = out_dir_path / f"{run_id}_{model_type}_seed{seed}.csv"
+    out_path = out_dir_path / f"{run_id}_{_model_tag(model_type)}_seed{seed}.csv"
     submission.to_csv(out_path, index=False)
     print(f"제출 파일 저장: {out_path}")
 
