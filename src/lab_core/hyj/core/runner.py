@@ -192,6 +192,8 @@ class RfLgbmRunner(BaseRunner):
                 )
             )
             artifacts["valid_rmse"] = rmse
+            artifacts["valid_pred"] = val_pred_out
+            artifacts["valid_y"] = y_valid_out
             print(f"[runner] valid rmse: {rmse:,.0f}")
 
         # valid가 있으면 train+valid로 재학습 후 test 예측
@@ -267,6 +269,24 @@ class RfLgbmRunner(BaseRunner):
                 "rf": art_rf,
             },
         }
+
+        valid_pred_lgbm = art_lgbm.get("valid_pred")
+        valid_pred_rf = art_rf.get("valid_pred")
+        valid_y = art_lgbm.get("valid_y")
+        if (
+            isinstance(valid_pred_lgbm, pd.Series)
+            and isinstance(valid_pred_rf, pd.Series)
+            and isinstance(valid_y, pd.Series)
+            and len(valid_pred_lgbm) == len(valid_pred_rf) == len(valid_y)
+        ):
+            valid_ens = (w_lgbm * valid_pred_lgbm) + (w_rf * valid_pred_rf)
+            valid_rmse = float(
+                mean_squared_error(
+                    np.asarray(valid_y), np.asarray(valid_ens), squared=False
+                )
+            )
+            artifacts["valid_rmse"] = valid_rmse
+            print(f"[runner] ensemble valid rmse: {valid_rmse:,.0f}")
 
         run_id = make_run_id(run_prefix, mid_id=self.__class__.__name__)
         run_dir = out_dir(out_subdir) / run_id
