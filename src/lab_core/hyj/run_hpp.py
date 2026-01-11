@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from lab_core.hyj.core.runner import ModelParams, RfLgbmRunner
+from lab_core.hyj.core.rf_lgbm_runner import ModelParams, RfLgbmRunner
 from lab_core.hyj.hpp_dataset_builder import HPPDatasetBuilder
 
 
