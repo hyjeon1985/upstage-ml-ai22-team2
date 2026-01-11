@@ -64,10 +64,6 @@ def cache_data_dir(path: Path | str | None = None) -> Path:
     return _resolve_path("data", "cache", path=path)
 
 
-def feat_data_dir(path: Path | str | None = None) -> Path:
-    return _resolve_path("data", "features", path=path)
-
-
 # -------------------------
 # Output directories
 # -------------------------
@@ -76,6 +72,3 @@ def feat_data_dir(path: Path | str | None = None) -> Path:
 def out_dir(path: Path | str | None = None) -> Path:
     return _resolve_path("outputs", path=path)
 
-
-def eda_out_dir(path: Path | str | None = None) -> Path:
-    return _resolve_path("outputs", "eda", path=path)

@@ -125,12 +125,11 @@ jupyter==1.0.0
 ├─ data/
 │  ├─ raw/        # 대회 제공 원본 데이터 (*.csv)
 │  ├─ ext/        # 허용된 외부 공공 데이터 (*.csv)
-│  ├─ cache/      # 디스크 캐시
-│  └─ features/   # 피처 테이블 (*.parquet, *.csv)
+│  └─ cache/      # 디스크 캐시
 │
 ├─ docs/          # 팀 공유 문서 (*.md, *.pdf)
 │
-├─ notebooks/     # 공용 노트북 파일
+├─ notebooks/     # 노트북 파일
 │  ├─ ejk/        # 개인 노트 (팀원 이니셜로 구분)
 │  ├─ hyj/
 │  ├─ shw/
@@ -141,7 +140,7 @@ jupyter==1.0.0
 ├─ script/       # CLI 스크립트 (*.py, *.sh)
 │
 ├─ src/
-│  └─ lab_core/   # 공통 파이썬 패키지
+│  └─ lab_core/   # 파이썬 패키지
 │     ├─ ejk/     # 개인 모듈 (팀원 이니셜로 구분)
 │     ├─ hyj/
 │     ├─ shw/

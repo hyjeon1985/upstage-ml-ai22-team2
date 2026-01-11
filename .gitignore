@@ -409,8 +409,6 @@ data/ext/**
 data/cache/**
 !data/cache/.gitkeep
 
-data/features/**
-!data/features/.gitkeep
 
 data/raw/**
 !data/raw/.gitkeep
