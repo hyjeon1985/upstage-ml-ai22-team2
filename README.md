@@ -125,7 +125,7 @@ jupyter==1.0.0
 ├─ data/
 │  ├─ raw/        # 대회 제공 원본 데이터 (*.csv)
 │  ├─ ext/        # 허용된 외부 공공 데이터 (*.csv)
-│  ├─ interim/    # 전처리 중간 산출물 (*.parquet)
+│  ├─ cache/      # 디스크 캐시
 │  └─ features/   # 피처 테이블 (*.parquet, *.csv)
 │
 ├─ docs/          # 팀 공유 문서 (*.md, *.pdf)

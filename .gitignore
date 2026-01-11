@@ -406,8 +406,8 @@ $RECYCLE.BIN/
 data/ext/**
 !data/ext/.gitkeep
 
-data/interim/**
-!data/interim/.gitkeep
+data/cache/**
+!data/cache/.gitkeep
 
 data/features/**
 !data/features/.gitkeep

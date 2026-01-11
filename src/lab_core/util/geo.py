@@ -18,11 +18,11 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     return earth_radius_km * c
 
 
-def to_xy_km(lat: np.ndarray, lon: np.ndarray, *, lat0: float) -> np.ndarray:
+def latlon_to_km(lat: np.ndarray, lon: np.ndarray, *, lat0: float) -> np.ndarray:
     """위경도를 기준 위도 기준의 평면 km 좌표로 근사 변환한다."""
     lat_r = np.radians(lat)
     lon_r = np.radians(lon)
     lat0_r = np.radians(lat0)
-    x = lon_r * np.cos(lat0_r) * 6371.0
-    y = lat_r * 6371.0
-    return np.column_stack([y, x])
+    y_km = lat_r * 6371.0
+    x_km = lon_r * np.cos(lat0_r) * 6371.0
+    return np.column_stack([y_km, x_km])

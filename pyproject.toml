@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 feature_pipeline = "lab_core.hyj.feature_pipeline:main"
+hpp_run = "lab_core.hyj.run_hpp:main"
 
 [dependency-groups]
 dev = ["ipykernel==6.27.1", "jupyter==1.0.0"]

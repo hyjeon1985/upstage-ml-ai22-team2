@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import re
+from abc import ABC, abstractmethod
+from pathlib import Path
+from typing import Any
+
 import pandas as pd
 
 
-class BaseBlock:
+class BaseBlock(ABC):
     """
     Pipeline을 구성하는 '전처리/피처 엔지니어링 블록'의 최소 인터페이스.
 
@@ -36,14 +41,28 @@ class BaseBlock:
          (특히 초보 단계에서는 안전지향이 낫다)
 
     4) 메타 컬럼
-       - `_is_train`, `_origin_index` 같은 메타 컬럼을 사용할 수 있다.
-       - 단, "모델 입력 직전" 정리 단계에서 제거하도록 별도 블록을 두는 것을 권장한다.
+       - 블록 생성 시 메타 컬럼 목록을 전달받고 내부 로직에서만 참조한다.
+       - 메타 컬럼 제거는 "모델 입력 직전" 정리 단계에서 처리한다.
     """
+
+    def __init__(
+        self,
+        meta_cols: tuple[str, ...],
+        name: str | None = None,
+        *,
+        use_cache: bool = False,
+        cache_dir: Path | None = None,
+    ) -> None:
+        self._meta_cols = meta_cols
+        self._name = name
+        self._use_cache = use_cache
+        self._cache_dir = cache_dir
 
     def fit(self, X: pd.DataFrame) -> None:
         """train 데이터에서만 상태(state)를 학습한다. (기본은 no-op)"""
         return None
 
+    @abstractmethod
     def transform(self, X: pd.DataFrame, *, is_train: bool) -> pd.DataFrame:
         """
         DataFrame을 변환하여 반환한다.
@@ -65,6 +84,29 @@ class BaseBlock:
         - 이 메서드는 반드시 오버라이드해야 한다.
         """
         raise NotImplementedError
+
+    def name(self) -> str:
+        """
+        블록을 대표하는 짧은 이름을 반환한다.
+        """
+        if self._name:
+            return self._name
+        return self._to_snake(self.__class__.__name__)
+
+    @abstractmethod
+    def describe(self) -> dict[str, str]:
+        """
+        블록의 핵심 설정값을 요약한다.
+
+        - 값은 JSON으로 기록 가능한 형태여야 한다.
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _to_snake(value: str) -> str:
+        s1 = re.sub(r"(.)([A-Z][a-z]+)", r"\1_\2", value)
+        s2 = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", s1)
+        return s2.lower()
 
 
 class Pipeline:
@@ -121,7 +163,9 @@ class Pipeline:
         """
         X = X.copy()
         for b in self.blocks:
+            print(f"[pipeline] fit: {b.name()}")
             b.fit(X)  # train only
+            print(f"[pipeline] transform(train): {b.name()}")
             X = b.transform(X, is_train=True)
         return X
 
@@ -134,5 +178,14 @@ class Pipeline:
         """
         X = X.copy()
         for b in self.blocks:
+            print(f"[pipeline] transform: {b.name()}")
             X = b.transform(X, is_train=False)
         return X
+
+    def summarize(self) -> list[dict[str, dict[str, str]]]:
+        """
+        파이프라인 구성 요약을 만든다.
+
+        - blocks 속성이 있으면 name/describe 기반으로 기록한다.
+        """
+        return [{b.name(): b.describe()} for b in self.blocks]

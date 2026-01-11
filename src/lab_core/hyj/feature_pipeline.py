@@ -8,7 +8,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 
 from lab_core.hyj.feature_data import load_ext_datas, load_raw_datas
-from lab_core.util.geo import haversine_distance, to_xy_km
+from lab_core.util.geo import haversine_distance, latlon_to_km
 from lab_core.util.path import out_dir
 from lab_core.util.time_ids import make_run_id
 
@@ -633,12 +633,12 @@ def fe_transport_features(
         return out
 
     lat0 = float(np.nanmean(apt_coords[:, 0]))
-    apt_xy = to_xy_km(apt_coords[:, 0], apt_coords[:, 1], lat0=lat0)
+    apt_yx = latlon_to_km(apt_coords[:, 0], apt_coords[:, 1], lat0=lat0)
 
     if len(subway_coords):
-        subway_xy = to_xy_km(subway_coords[:, 0], subway_coords[:, 1], lat0=lat0)
-        subway_tree = cKDTree(subway_xy)
-        _, subway_idx = subway_tree.query(apt_xy, k=1)
+        subway_yx = latlon_to_km(subway_coords[:, 0], subway_coords[:, 1], lat0=lat0)
+        subway_tree = cKDTree(subway_yx)
+        _, subway_idx = subway_tree.query(apt_yx, k=1)
         out.loc[valid, "subway_dist"] = [
             haversine_distance(
                 apt_coords[i, 0],
@@ -648,13 +648,13 @@ def fe_transport_features(
             )
             for i in range(len(apt_coords))
         ]
-        subway_500m = subway_tree.query_ball_point(apt_xy, r=subway_r_km, p=2.0)
+        subway_500m = subway_tree.query_ball_point(apt_yx, r=subway_r_km, p=2.0)
         out.loc[valid, "subway_cnt_500m"] = [len(x) for x in subway_500m]
 
     if len(bus_coords):
-        bus_xy = to_xy_km(bus_coords[:, 0], bus_coords[:, 1], lat0=lat0)
-        bus_tree = cKDTree(bus_xy)
-        _, bus_idx = bus_tree.query(apt_xy, k=1)
+        bus_yx = latlon_to_km(bus_coords[:, 0], bus_coords[:, 1], lat0=lat0)
+        bus_tree = cKDTree(bus_yx)
+        _, bus_idx = bus_tree.query(apt_yx, k=1)
         out.loc[valid, "bus_dist"] = [
             haversine_distance(
                 apt_coords[i, 0],
@@ -664,7 +664,7 @@ def fe_transport_features(
             )
             for i in range(len(apt_coords))
         ]
-        bus_300m = bus_tree.query_ball_point(apt_xy, r=bus_r_km, p=2.0)
+        bus_300m = bus_tree.query_ball_point(apt_yx, r=bus_r_km, p=2.0)
         out.loc[valid, "bus_cnt_300m"] = [len(x) for x in bus_300m]
 
     return out

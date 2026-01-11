@@ -60,8 +60,8 @@ def ext_data_dir(path: Path | str | None = None) -> Path:
     return _resolve_path("data", "ext", path=path)
 
 
-def interim_data_dir(path: Path | str | None = None) -> Path:
-    return _resolve_path("data", "interim", path=path)
+def cache_data_dir(path: Path | str | None = None) -> Path:
+    return _resolve_path("data", "cache", path=path)
 
 
 def feat_data_dir(path: Path | str | None = None) -> Path:
