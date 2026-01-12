@@ -4,10 +4,10 @@
 
 ## Team
 
-| <img src="https://avatars.githubusercontent.com/u/156163982?v=4" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_wjk.png" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_shw.png" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_hyj.jpg" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> |
-| :-----------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: |
-|                                                  [곽은주](https://github.com/UpstageAILab)                                                  |                                   [김원재](https://github.com/UpstageAILab)                                    |                                   [왕시훈](https://github.com/UpstageAILab)                                    |                                   [전호열](https://github.com/UpstageAILab)                                    |
-|                                                               대회 코드 작성                                                                |                             외부 데이터 수집<br/>발표자료 작성<br/>대회 코드 작성                              |                         발표 자료 작성<br/>대회 코드 작성<br/>**_\*public RMSE 1위_**                          |                             코드 저장소 관리<br/>환경 세팅 지원<br/>대회 코드 작성                             |
+| <img src="https://avatars.githubusercontent.com/u/156163982?v=4" width="120" height="120" /> | <img src="docs/img/profile_wjk.png" width="120" height="120" /> | <img src="docs/img/profile_shw.png" width="120" height="120" /> | <img src="docs/img/profile_hyj.jpg" width="120" height="120" /> |
+| :------------------------------------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: | :-------------------------------------------------------------: |
+|                          [곽은주](https://github.com/UpstageAILab)                           |            [김원재](https://github.com/UpstageAILab)            |            [왕시훈](https://github.com/UpstageAILab)            |            [전호열](https://github.com/UpstageAILab)            |
+|                                        대회 코드 작성                                        |      외부 데이터 수집<br/>발표자료 작성<br/>대회 코드 작성      |  발표 자료 작성<br/>대회 코드 작성<br/>**_\*public RMSE 1위_**  |     코드 저장소 관리<br/>환경 세팅 지원<br/>대회 코드 작성      |
 
 ## 0. Overview
 
@@ -171,7 +171,7 @@ jupyter==1.0.0
 - 목표: 서울시 아파트 매매 실거래가 예측(RMSE)
 - 좌표 결측 보완을 위해 시군구/도로명 기반 주소를 사용해 외부 좌표를 생성
 - 데이터 규모: train 111만 x 52, test 9,272 x 51
-- 기간: train(2007.01~2023.06), test(2023.07~2023.09)
+- 데이터 날짜 범위: train(2007.01 ~ 2023.06), test(2023.07 ~ 2023.09)
 
 ### EDA
 
@@ -199,7 +199,8 @@ jupyter==1.0.0
 
 ### Modeling Process
 
-- 시계열 특성을 고려해 계약년월 기준으로 Train/Validation 분할(발표 기준: Train ~2022.06 / Valid 2022.07~2023.06)
+- 시계열 특성을 고려해 계약년월 기준으로 Train/Validation 분할
+  - 발표 기준: Train( ~ 2022.06), Valid (2022.07 ~ 2023.06)
 - LightGBM 하이퍼파라미터 조합을 반복 실험하여 성능 비교
 - 최종 모델은 Train+Validation을 합쳐 재학습 후 Test 예측
 - Feature Importance를 통해 주요 변수 기여도를 확인
@@ -237,3 +238,4 @@ jupyter==1.0.0
 ### Reference
 
 - 참고한 외부 공공 데이터: [서울시 공공주택 아파트 정보](https://data.seoul.go.kr/dataList/OA-15818/S/1/datasetView.do)
+- 주소 기반 좌표 보완 API: [Kakao Local API - 주소 검색](https://dapi.kakao.com/v2/local/search/address.json)
