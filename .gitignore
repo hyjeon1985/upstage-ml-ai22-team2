@@ -408,6 +408,10 @@ $RECYCLE.BIN/
 
 data/cache/**
 !data/cache/.gitkeep
+data/raw/*.csv
+data/ext/*.csv
+docs/img/*
+docs/*.pptx
 
 # data/raw/**
 # !data/raw/.gitkeep

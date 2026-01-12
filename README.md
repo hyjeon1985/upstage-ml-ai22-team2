@@ -4,8 +4,8 @@
 
 ## Team
 
-| <img src="https://avatars.githubusercontent.com/u/156163982?v=4" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_wjk.png" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_shw.png" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> | <img src="docs/img/profile_hyj.jpg" width="120" height="120" style="object-fit: cover; border-radius: 8px;" /> |
-| :-----------------------------------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------------------------: |
+| ![곽은주](https://avatars.githubusercontent.com/u/156163982?v=4) | ![김원재](https://avatars.githubusercontent.com/u/156163982?v=4) | ![왕시훈](https://avatars.githubusercontent.com/u/156163982?v=4) | ![전호열](https://avatars.githubusercontent.com/u/156163982?v=4) |
+| :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: | :--------------------------------------------------------------: |
 |                                                  [곽은주](https://github.com/UpstageAILab)                                                  |                                   [김원재](https://github.com/UpstageAILab)                                    |                                   [왕시훈](https://github.com/UpstageAILab)                                    |                                   [전호열](https://github.com/UpstageAILab)                                    |
 |                                                               대회 코드 작성                                                                |                             외부 데이터 수집<br/>발표자료 작성<br/>대회 코드 작성                              |                         발표 자료 작성<br/>대회 코드 작성<br/>**_\*public RMSE 1위_**                          |                             코드 저장소 관리<br/>환경 세팅 지원<br/>대회 코드 작성                             |
 
@@ -211,11 +211,11 @@ jupyter==1.0.0
 - Public RMSE: 14973.0670
 - Private RMSE: 11847.0515
 
-<img src="docs/img/leaderboard.png" alt="Leader Board" width="800" />
+리더보드 캡처 이미지는 별도 공유합니다.
 
 ### Presentation
 
-- 발표 자료: [아파트 실거래가 예측 경진대회 발표 자료](docs/[패스트캠퍼스]-AI-부트캠프-22기_ML-2조-아파트_실거래가_예측_경진대회_발표.pptx)
+- 발표 자료: 별도 공유합니다.
 - 고득점 노트북: [CodeFinal.ipynb](notebooks/shw/CodeFinal.ipynb)
 
 ### Interpretation
@@ -224,7 +224,7 @@ jupyter==1.0.0
 - 상대적으로 단순한 구조의 모델이 일반화 성능에서 안정적인 결과를 보였음
 - 변수 중요도 상위: 동, 전용면적, 계약년, 도로명, 구 (상위 5개가 약 96% 기여)
 
-<img src="docs/img/feature_importance.png" alt="Feature Importance" width="800" />
+변수 중요도 이미지는 별도 공유합니다.
 
 ## etc
 
