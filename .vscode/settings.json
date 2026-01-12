@@ -1,0 +1,130 @@
+{
+  // ===== Commonly Used =====
+
+  // 저장 시 포맷
+  "editor.formatOnSave": true,
+
+  // ===== Text Editor =====
+
+  // 컬러풀한 괄호쌍
+  "editor.bracketPairColorization.enabled": true,
+  "editor.bracketPairColorization.independentColorPoolPerBracketType": true,
+
+  // 저장 시 자동 코드 액션
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+
+  // 괄호쌍 가이드 보이기
+  "editor.guides.bracketPairs": true,
+
+  // 구문 하이라이팅 지원
+  "editor.semanticHighlighting.enabled": true,
+
+  // 커스텀 토큰 컬러 지원
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "keyword.other.dotenv",
+        "settings": {
+          "foreground": "#FF000000"
+        }
+      }
+    ]
+  },
+
+  // 파일 확장자별 연관 언어 규칙
+  "files.associations": {
+    ".env*": "dotenv"
+  },
+
+  // ===== Workbench =====
+
+  "workbench.editorAssociations": {
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "file:/**/*.csv": "jupyter-data-wrangler"
+  },
+
+  // Editor Management
+  "workbench.editor.empty.hint": "hidden",
+
+  // ===== Features =====
+
+  // Terminal
+  "terminal.integrated.minimumContrastRatio": 1,
+
+  // Notebook
+  "notebook.lineNumbers": "on",
+
+  // ===== Extensions =====
+
+  // Pylance
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.completeFunctionParens": true,
+  "python.analysis.typeCheckingMode": "basic",
+
+  // Rainvow CSV
+  "rainbow_csv.highlight_rows": true,
+  "rainbow_csv.virtual_alignment_mode": "always",
+  "rainbow_csv.virtual_alignment_char": "space",
+
+  // Python
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.testing.pytestEnabled": true,
+
+  // YAML
+  "redhat.telemetry.enabled": true,
+
+  // ===== Language-specific =====
+  "[css]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[less]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tombi-toml.tombi"
+  },
+  "[tsv]": {
+    "editor.inlayHints.maximumLength": 0
+  },
+  "[csv]": {
+    "editor.inlayHints.maximumLength": 0
+  }
+}
