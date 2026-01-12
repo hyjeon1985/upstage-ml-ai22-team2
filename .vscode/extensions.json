@@ -1,0 +1,27 @@
+{
+  "recommendations": [
+    "ms-toolsai.datawrangler",
+    "mechatroner.rainbow-csv",
+    "charliermarsh.ruff",
+    "prettier.prettier-vscode",
+    "bierner.markdown-checkbox",
+    "bierner.markdown-footnotes",
+    "bierner.markdown-mermaid",
+    "bierner.github-markdown-preview",
+    "tombi-toml.tombi",
+    "remcohaszing.schemastore",
+    "aykutsarac.jsoncrack-vscode",
+    "njpwerner.autodocstring",
+    "catppuccin.catppuccin-vsc-pack",
+    "codezombiech.gitignore",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-ssh-edit",
+    "ms-toolsai.jupyter",
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-emoji",
+    "bierner.markdown-preview-github-styles",
+    "bierner.markdown-yaml-preamble",
+    "ms-python.python",
+    "mikestead.dotenv"
+  ]
+}
