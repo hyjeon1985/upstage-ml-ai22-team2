@@ -238,4 +238,4 @@ jupyter==1.0.0
 ### Reference
 
 - 참고한 외부 공공 데이터: [서울시 공공주택 아파트 정보](https://data.seoul.go.kr/dataList/OA-15818/S/1/datasetView.do)
-- 주소 기반 좌표 보완 API: [Kakao Local API - 주소 검색](https://dapi.kakao.com/v2/local/search/address.json)
+- 주소 기반 좌표 보완 API: [Kakao Local API - 주소 검색](https://developers.kakao.com/docs/latest/ko/local/dev-guide)
