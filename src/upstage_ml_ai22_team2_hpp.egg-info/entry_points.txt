@@ -1,0 +1,2 @@
+[console_scripts]
+hpp_run = lab_core.hyj.run_hpp:main

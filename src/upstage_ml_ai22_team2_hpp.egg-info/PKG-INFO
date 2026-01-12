@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: upstage-ml-ai22-team2-hpp
+Version: 0.1.0
+Requires-Python: ==3.10.13
+License-File: LICENSE
+Requires-Dist: eli5==0.13.0
+Requires-Dist: lightgbm==4.2.0
+Requires-Dist: matplotlib==3.7.1
+Requires-Dist: numpy==1.23.5
+Requires-Dist: pandas==1.5.3
+Requires-Dist: scikit-learn==1.2.2
+Requires-Dist: scipy==1.11.3
+Requires-Dist: seaborn==0.12.2
+Requires-Dist: statsmodels==0.14.0
+Requires-Dist: tqdm==4.66.1
+Dynamic: license-file
