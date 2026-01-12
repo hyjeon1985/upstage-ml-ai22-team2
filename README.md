@@ -215,8 +215,10 @@ jupyter==1.0.0
 
 ### Presentation
 
-- 발표 자료: [아파트 실거래가 예측 경진대회 발표 자료](docs/[패스트캠퍼스]-AI-부트캠프-22기_ML-2조-아파트_실거래가_예측_경진대회_발표.pptx)
-- 고득점 노트북: [CodeFinal.ipynb](notebooks/shw/CodeFinal.ipynb)
+- 발표 자료: [아파트 실거래가 예측 경진대회 발표 자료](https://docs.google.com/presentation/d/1HNOPJU31c8MF5IExVmSmKNq-aIr2oYIGQbroRHYbemE/edit?usp=sharing)
+- 좋은 평가를 받은 노트북들 (RMSE: 예측 오차 지표, 낮을수록 좋음):
+  - [RMSE 14,973](notebooks/shw/CodeFinal.ipynb)
+  - [RMSE 17,725](notebooks/wjk/house_price_prediction_17725.ipynb)
 
 ### Interpretation
 
